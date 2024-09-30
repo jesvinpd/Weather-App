@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherApp</title>
+</head>
+<style>
+    body{
+        background-color: rgb(6, 6, 61);
+        color: white;
+    }
+    button:active{
+        background-color: rgb(241, 248, 125);
+        font-weight: 600;
+        font-size: larger;
+    }
+    input:hover{
+        background-color: rgb(0, 0, 0);
+        color: white;
+    }
+</style>
+<body>
+    
+    <div id="App">
+         <input id="cityName" placeholder="City name to search.." type="text">
+         <button id="getWeather">Get climate</button>
+         <div id="weatherContent"></div> 
+    </div>
+
+</body>
+<script>
+
+    const getWeatherBtn = document.getElementById('getWeather');
+    const weatherContentDiv = document.getElementById("weatherContent");
+
+    getWeatherBtn.onclick = ()=>fetchData();
+
+    async function fetchData(){
+        const city = document.getElementById('cityName').value;//value can be taken only after the btn is clicked
+        const apiKey = '705e81e37629b7c3114437bcd4ff886f';
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?units=metric&q=${city}&appid=${apiKey}`;
+        
+        try{
+             const response = await fetch(apiUrl);
+             const data = await response.json();//To maintain server we need try catch even there is an error
+             console.log(data);
+
+             if(data.cod === 200)//cod = HTTP status code of the API request
+             {
+                const cityName = data.name;
+                const weatherDescription = data.weather[0].description;
+                const temp = data.main.temp;
+                const wind = data.wind;
+                const humidity = data.main.humidity;
+
+             weatherContentDiv.innerHTML = `
+                                <h2>${cityName}</h2>
+                                <p>${weatherDescription}</p>
+                                <h3>Temperature: ${temp}°C</h3>
+                                <h3>Wind speed: ${wind.speed} kmph</h3>
+                                <h3>Humidity: ${humidity}%</h3>
+                             `;                
+             }
+             else
+             {
+                weatherContentDiv.innerHTML = `<h1>${data.message}</h1>`;
+             }
+
+
+        }catch(error){
+            weatherContentDiv.innerHTML = `<h1>${error.message}</h1>`;
+        }
+           
+    }
+</script>
+</html>
